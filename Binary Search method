@@ -1,0 +1,67 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+
+    cout << "Enter the number of elements (max 10): ";
+    cin >> n;
+
+    if (n <= 0 || n > 10) {
+        cout << "Invalid input! Please enter a number between 1 and 10.\n";
+        return 1;
+    }
+
+    int a[10];
+    cout << "Enter " << n << " elements:\n";
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+    }
+
+    // Sort the array in ascending order manually using Bubble Sort
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (a[j] > a[j + 1]) {
+                // Swap elements
+                int temp = a[j];
+                a[j] = a[j + 1];
+                a[j + 1] = temp;
+            }
+        }
+    }
+
+    cout << "\nArray rearranged in ascending order:\n";
+    for (int i = 0; i < n; i++) {
+        cout << a[i] << " ";
+    }
+    cout << endl;
+
+    // Binary search logic
+    int key;
+    cout << "\nEnter the key element to search: ";
+    cin >> key;
+
+    int low = 0, upper = n - 1, mid;
+    bool found = false;
+
+    while (low <= upper) {
+        mid = (low + upper) / 2;
+
+        if (a[mid] == key) {
+            found = true;
+            break;
+        } else if (key < a[mid]) {
+            upper = mid - 1;
+        } else {
+            low = mid + 1;
+        }
+    }
+
+    if (found) {
+        cout << "\nThe key element " << key << " is found at index " << mid << ".\n";
+    } else {
+        cout << "\nThe key element " << key << " is not found.\n";
+    }
+
+    return 0;
+}
