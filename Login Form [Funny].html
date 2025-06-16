@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Funny Login Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111827;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      transition: background-color 0.2s;
+    }
+    .blink-red {
+      animation: redAlert 0.6s ease-in-out 2;
+    }
+    @keyframes redAlert {
+      0%, 100% {
+        background-color: #111827;
+      }
+      25%, 75% {
+        background-color: rgba(127, 29, 29, 0.7);
+        box-shadow: 0 0 15px red;
+      }
+      50% {
+        background-color: rgba(220, 38, 38, 0.8);
+        box-shadow: 0 0 25px red;
+      }
+    }
+    .login-box {
+      background: #1f2937;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.7);
+      text-align: center;
+      position: relative;
+    }
+    .login-box h2 {
+      color: white;
+      background-color: #0d1117;
+      padding: 5px 0;
+      text-shadow: 0 0 10px #0ff;
+    }
+    input {
+      display: block;
+      width: 250px;
+      margin: 10px auto;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    input.error {
+      border: 2px solid red;
+    }
+    #submitBtn {
+      background: #00b894;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      position: relative;
+      transition: 0.3s ease-in-out;
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(0, 255, 200, 0.4);
+    }
+    #submitBtn:hover {
+      transform: scale(1.15);
+    }
+    .error-msg {
+      color: red;
+    }
+    .success-msg {
+      color: #00ff99;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button id="submitBtn">Submit</button>
+  </div>
+
+  <script>
+    const submitBtn = document.getElementById("submitBtn");
+    const username = document.getElementById("username");
+    const password = document.getElementById("password");
+    const body = document.querySelector("body");
+
+    let alarmTriggered = false;
+    let chasedOnce = false;
+    let movedBeforeValid = false;
+    let userTriedToSubmitWithoutFilling = false;
+
+    function resetButtonPosition() {
+      submitBtn.style.transform = "translate(0, 0)";
+    }
+
+    function triggerAlarm() {
+      if (!alarmTriggered) {
+        alarmTriggered = true;
+        body.classList.add("blink-red");
+        setTimeout(() => {
+          body.classList.remove("blink-red");
+        }, 1200);
+      }
+    }
+
+    function handleChase() {
+      const userEmpty = !username.value;
+      const passEmpty = !password.value;
+
+      if (userEmpty || passEmpty) {
+        userTriedToSubmitWithoutFilling = true;
+
+        const xMove = (Math.random() - 0.5) * 800;
+        const yMove = (Math.random() - 0.5) * 500;
+        submitBtn.style.transform = `translate(${xMove}px, ${yMove}px)`;
+        chasedOnce = true;
+        movedBeforeValid = true;
+
+        username.classList.toggle("error", userEmpty);
+        password.classList.toggle("error", passEmpty);
+
+        if (userEmpty && passEmpty) {
+          submitBtn.textContent = "Abe Password and Username de agote!";
+        } else if (userEmpty) {
+          submitBtn.textContent = "Abe Username de agote!";
+        } else {
+          submitBtn.textContent = "Abe Password de agote!";
+        }
+
+        triggerAlarm();
+      }
+    }
+
+    submitBtn.addEventListener("mouseenter", () => {
+      if (!username.value || !password.value) {
+        handleChase();
+      }
+    });
+
+    submitBtn.addEventListener("click", () => {
+      const userEmpty = !username.value;
+      const passEmpty = !password.value;
+
+      if (userEmpty || passEmpty) {
+        handleChase();
+      } else {
+        if (movedBeforeValid) {
+          submitBtn.textContent = "Deh bhai etia submit kor";
+          resetButtonPosition();
+        } else {
+          submitBtn.textContent = "Submit";
+        }
+        alert("Login successful! ✅");
+      }
+    });
+
+    function updateSubmitText() {
+      const userFilled = username.value;
+      const passFilled = password.value;
+
+      if (!userFilled || !passFilled) {
+        username.classList.toggle("error", !userFilled);
+        password.classList.toggle("error", !passFilled);
+
+        if (chasedOnce) {
+          if (!userFilled && !passFilled) {
+            submitBtn.textContent = "Abe Password and Username de agote!";
+          } else if (!userFilled) {
+            submitBtn.textContent = "Abe Username de agote!";
+          } else {
+            submitBtn.textContent = "Abe Password de agote!";
+          }
+        } else {
+          submitBtn.textContent = "Submit";
+        }
+      } else {
+        if (movedBeforeValid && userTriedToSubmitWithoutFilling) {
+          submitBtn.textContent = "Deh bhai etia submit kor";
+          resetButtonPosition();
+        } else {
+          submitBtn.textContent = "Submit";
+        }
+      }
+    }
+
+    username.addEventListener("input", updateSubmitText);
+    password.addEventListener("input", updateSubmitText);
+  </script>
+</body>
+</html>

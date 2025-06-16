@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Page</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Background Animation with Multi-Color Rotation */
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(120deg, #ff5f6d, #ffc371, #00c9ff, #92fe9d);
+            background-size: 300% 300%;
+            animation: rotatingBackground 8s linear infinite;
+            font-family: Arial, sans-serif;
+            color: #fff;
+        }
+
+        @keyframes rotatingBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Container with Slide-In Animation */
+        .container {
+            text-align: center;
+            animation: fadeInSlide 2s ease forwards, floatAnimation 6s ease-in-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes fadeInSlide {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes floatAnimation {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Title with Glow Animation */
+        .title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            animation: titleGlow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 10px #ffc371, 0 0 20px #ff5f6d; }
+            to { text-shadow: 0 0 20px #92fe9d, 0 0 30px #00c9ff; }
+        }
+
+        /* Subtitle */
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        /* Button Styles */
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background: #ff5f6d;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            background: #ffc371;
+            transform: scale(1.1);
+        }
+
+        /* Ripple Effect for Buttons */
+        .btn:after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            opacity: 0;
+            transition: transform 0.5s, opacity 0.5s;
+            transform: scale(1);
+        }
+
+        .btn:hover:after {
+            transform: scale(4);
+            opacity: 0;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+            animation: fadeInModal 0.5s ease;
+        }
+
+        .modal-content {
+            background: linear-gradient(45deg, #ff5f6d, #ffc371);
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        .close-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #ff5f6d;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #ffc371;
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="title">Welcome to Our Page</h1>
+        <p class="subtitle">A place of creativity, inspiration, and growth.</p>
+        
+        <!-- Button Container -->
+        <div class="btn-container">
+            <button class="btn" onclick="openModal()">Get Started</button>
+            <button class="btn" onclick="showAlert()">About Us</button>
+            <button class="btn" onclick="toggleBackground()">Toggle Background</button>
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal" id="welcomeModal">
+        <div class="modal-content">
+            <h2>Welcome!</h2>
+            <p>We’re excited to have you here. Dive in to explore more.</p>
+            <button class="close-btn" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Open Modal Function
+        function openModal() {
+            document.getElementById("welcomeModal").style.display = "flex";
+        }
+
+        // Close Modal Function
+        function closeModal() {
+            document.getElementById("welcomeModal").style.display = "none";
+        }
+
+        // Close Modal when clicking outside
+        window.onclick = function(event) {
+            let modal = document.getElementById("welcomeModal");
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        };
+
+        // Show Alert Function
+        function showAlert() {
+            alert("Welcome to the About Us page! Here, you’ll learn more about our journey and values.");
+        }
+
+        // Toggle Background Color Animation
+        let bgToggled = false;
+        function toggleBackground() {
+            document.body.style.animation = bgToggled ? 'rotatingBackground 8s linear infinite' : 'newBackgroundAnimation 10s linear infinite';
+            bgToggled = !bgToggled;
+        }
+
+        // New Background Animation Keyframes
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                @keyframes newBackgroundAnimation {
+                    0% { background-position: 0% 0%; background-color: #00c9ff; }
+                    50% { background-position: 100% 100%; background-color: #92fe9d; }
+                    100% { background-position: 0% 0%; background-color: #ff5f6d; }
+                }
+            </style>
+        `);
+    </script>
+
+</body>
+</html>

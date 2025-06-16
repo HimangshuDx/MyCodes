@@ -1,0 +1,96 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    
+}
+body{
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #2b2a2a;
+    color: aqua;
+}
+div{
+    width: 265px;
+    height: 215px;
+    box-shadow: 16px 14px 20px #0000008c;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center ;
+    
+
+}
+div::before{
+    content: "";
+    position:asolute;
+    translate: -50% -50%;
+    left: 50%;
+    top: 50%;
+    z-index: -1;
+    padding: 3px;
+    background-image: conic-gradient(
+        #1fd6b5,
+        #55f790,
+        #94fa4c,
+        #32cd32,
+        #25c5fa,
+        #1e90ff,
+        #00f6e1,
+        #dd9cfd,
+        transparent 200deg);
+    width: 250%;
+    height: 200%;
+    position: absolute;
+    animation: rotate 5s linear infinite ;
+    filter: blur(1.5rem);
+    opacity: 0.8 ;
+}
+div::after
+{
+    content: "Himangshu";
+    width: 250px;
+    height: 200px;
+    background: #000000;
+    position: absolute;
+    border-radius:  10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #09ff00;
+    font-size: large;
+    letter-spacing: 3px;
+    box-shadow: inset 20px 20px #0000008c;
+    animation: color 5s linear infinite ;
+
+}
+@keyframes rotate
+ {
+    0%
+    {
+    transform: rotate(0deg);
+    
+    }
+    100%
+    {
+    transform: rotate(360deg);
+    }
+    
+}
+@keyframes color
+ {
+    0%
+    {
+    filter: hue-rotate(90deg) ;
+    
+    }
+    100%
+    {
+    filter: hue-rotate(360deg);
+    }
+    
+}
