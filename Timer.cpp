@@ -1,21 +1,24 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <Windows.h>
+using namespace std;
 
-void timer(int seconds) {
+void timer(int seconds) 
+{
     for (int i = seconds; i >= 0; --i) {
-        std::cout << "Time left: " << i << " seconds\r" << std::flush;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        cout << "Time left: " << i << " seconds\r" << flush;
+        Sleep(1000);
     }
-    std::cout << "\nTimer finished!\n";
+    cout << "\n\nTimer finished!\n";
 }
 
 int main() {
     int seconds;
-    std::cout << "Enter the number of seconds for the timer: ";
-    std::cin >> seconds;
+    cout << "\n\nEnter the number of seconds for the timer: ";
+    cin >> seconds;
 
-    std::cout << "Starting timer...\n";
+    cout << "Starting timer...\n\n1";
     timer(seconds);
 
     return 0;

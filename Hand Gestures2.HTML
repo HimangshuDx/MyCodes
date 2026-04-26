@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Particle Morphing System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Roboto+Mono:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f3ff;
+            --secondary: #bc13fe;
+            --bg: #020204;
+            --panel-bg: rgba(5, 10, 20, 0.85);
+        }
+
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background: var(--bg); 
+            font-family: 'Rajdhani', sans-serif; 
+            user-select: none;
+        }
+
+        /* 3D Canvas */
+        canvas { display: block; }
+
+        /* HUD UI Layer */
+        #ui-layer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            box-sizing: border-box;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        /* Header Info */
+        .hud-panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 4px;
+            backdrop-filter: blur(5px);
+            margin-bottom: 10px;
+            width: fit-content;
+        }
+
+        h1 { margin: 0; font-size: 1.5rem; letter-spacing: 2px; color: white; text-transform: uppercase; }
+        .data-text { font-family: 'Roboto Mono', monospace; font-size: 0.8rem; color: var(--primary); margin-top: 5px; }
+
+        /* Status Indicators */
+        #status-box {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 5px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            color: #fff;
+        }
+        .metric span { color: var(--secondary); margin-left: 10px; font-weight: bold; }
+
+        /* Webcam Scanner Look */
+        #cam-container {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 240px;
+            height: 180px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+            opacity: 0.7;
+        }
+        
+        .scan-line {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--primary);
+            animation: scan 2s linear infinite;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        @keyframes scan { 0% {top: 0%; opacity:0;} 10% {opacity:1;} 90% {opacity:1;} 100% {top: 100%; opacity:0;} }
+
+        /* Start Button */
+        #overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+            z-index: 100;
+        }
+        
+        #startBtn {
+            padding: 15px 40px;
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+        
+        #startBtn:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 30px var(--primary);
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            color: #888;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        #loading { color: var(--primary); margin-top: 15px; font-family: 'Roboto Mono', monospace; display:none; }
+
+    </style>
+</head>
+<body>
+
+<div id="ui-layer">
+    <div class="hud-panel">
+        <h1>Morphogen Engine</h1>
+        <div id="mode-display" class="data-text">SYSTEM: STANDBY</div>
+        <div id="gesture-display" class="data-text">INPUT: NONE</div>
+    </div>
+
+    <div id="status-box">
+        <div class="metric">PARTICLES <span>15,000</span></div>
+        <div class="metric">EXPANSION <span><span id="exp-val">1.0</span>x</span></div>
+        <div class="metric">FPS <span><span id="fps-val">60</span></span></div>
+    </div>
+
+    <div id="cam-container">
+        <video id="video" autoplay muted playsinline></video>
+        <div class="scan-line"></div>
+    </div>
+</div>
+
+<div id="overlay">
+    <button id="startBtn">INITIALIZE SYSTEM</button>
+    <div id="loading">LOADING NEURAL NETWORKS...</div>
+    <div class="instructions">
+        👌 PINCH index & thumb to switch shapes<br>
+        🖐️ SPREAD fingers to expand particles
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+<script>
+/* -----------------------------------------------------------
+   1. SETUP & CONSTANTS
+----------------------------------------------------------- */
+const CONFIG = {
+    particleCount: 15000,
+    particleSize: 0.12,
+    colors: {
+        primary: new THREE.Color(0x00f3ff),
+        secondary: new THREE.Color(0xbc13fe),
+        danger: new THREE.Color(0xff0055)
+    }
+};
+
+let scene, camera, renderer, composer;
+let geometry, material, points;
+let isInteracting = false;
+let targetExpansion = 1.0;
+let currentExpansion = 1.0;
+let targetRotation = { x: 0, y: 0 };
+let currentRotation = { x: 0, y: 0 };
+let fpsCounter = 0;
+let lastTime = performance.now();
+
+// Buffers
+const positions = new Float32Array(CONFIG.particleCount * 3);
+const targets = new Float32Array(CONFIG.particleCount * 3);
+const colors = new Float32Array(CONFIG.particleCount * 3);
+
+/* -----------------------------------------------------------
+   2. INITIALIZATION
+----------------------------------------------------------- */
+function init() {
+    // Scene Setup
+    scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x020204, 0.02);
+
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100);
+    camera.position.z = 30;
+
+    renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    document.body.appendChild(renderer.domElement);
+
+    // Particles
+    geometry = new THREE.BufferGeometry();
+    
+    // Initial Random Positions
+    for(let i=0; i<CONFIG.particleCount*3; i++) {
+        positions[i] = (Math.random() - 0.5) * 100;
+        colors[i] = 1;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    // Material with Additive Blending for Glow
+    material = new THREE.PointsMaterial({
+        size: CONFIG.particleSize,
+        vertexColors: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        transparent: true,
+        opacity: 0.9
+    });
+
+    points = new THREE.Points(geometry, material);
+    scene.add(points);
+
+    // Post-Processing (Bloom Effect)
+    const renderScene = new THREE.RenderPass(scene, camera);
+    const bloomPass = new THREE.UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight), 
+        1.5, 0.4, 0.85 // Strength, Radius, Threshold
+    );
+    bloomPass.threshold = 0;
+    bloomPass.strength = 1.2;
+    bloomPass.radius = 0.5;
+
+    composer = new THREE.EffectComposer(renderer);
+    composer.addPass(renderScene);
+    composer.addPass(bloomPass);
+
+    // Load Initial Shape
+    shapeGenerators.DNA(); 
+    document.getElementById("mode-display").innerText = "SYSTEM: DNA_HELIX";
+
+    window.addEventListener('resize', onWindowResize, false);
+}
+
+/* -----------------------------------------------------------
+   3. SHAPE GENERATORS (SCIENTIFIC)
+----------------------------------------------------------- */
+function setTarget(i, x, y, z) {
+    targets[i*3] = x; targets[i*3+1] = y; targets[i*3+2] = z;
+}
+
+function colorize(color1, color2) {
+    for(let i=0; i<CONFIG.particleCount; i++) {
+        const mix = Math.random();
+        colors[i*3] = THREE.MathUtils.lerp(color1.r, color2.r, mix);
+        colors[i*3+1] = THREE.MathUtils.lerp(color1.g, color2.g, mix);
+        colors[i*3+2] = THREE.MathUtils.lerp(color1.b, color2.b, mix);
+    }
+    geometry.attributes.color.needsUpdate = true;
+}
+
+const shapeGenerators = {
+    DNA: () => {
+        for(let i=0; i<CONFIG.particleCount; i++) {
+            const t = (i / CONFIG.particleCount) * Math.PI * 20;
+            const x = Math.sin(t) * 6;
+            const z = Math.cos(t) * 6;
+            const y = (i / CONFIG.particleCount) * 40 - 20;
+            // Double helix offset
+            const offset = i % 2 === 0 ? 1 : -1; 
+            setTarget(i, x*offset, y, z*offset);
+        }
+        colorize(CONFIG.colors.primary, new THREE.Color(0x0044ff));
+    },
+    SPHERE: () => {
+        for(let i=0; i<CONFIG.particleCount; i++) {
+            const phi = Math.acos(-1 + (2 * i) / CONFIG.particleCount);
+            const theta = Math.sqrt(CONFIG.particleCount * Math.PI) * phi;
+            const r = 12;
+            setTarget(i, r * Math.sin(phi) * Math.cos(theta), r * Math.sin(phi) * Math.sin(theta), r * Math.cos(phi));
+        }
+        colorize(CONFIG.colors.secondary, CONFIG.colors.primary);
+    },
+    TORUS: () => {
+        for(let i=0; i<CONFIG.particleCount; i++) {
+            const u = Math.random() * Math.PI * 2;
+            const v = Math.random() * Math.PI * 2;
+            const R = 10; const r = 4;
+            setTarget(i, (R + r*Math.cos(v))*Math.cos(u), (R + r*Math.cos(v))*Math.sin(u), r*Math.sin(v));
+        }
+        colorize(new THREE.Color(0x00ff88), new THREE.Color(0x0088ff));
+    },
+    HEART: () => {
+        for(let i=0; i<CONFIG.particleCount; i++) {
+            const t = Math.random() * Math.PI * 2;
+            const r = Math.random(); // volume filler
+            // Heart math
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+            setTarget(i, x * 0.8, y * 0.8, (Math.random()-0.5)*5);
+        }
+        colorize(CONFIG.colors.danger, CONFIG.colors.secondary);
+    }
+};
+
+/* -----------------------------------------------------------
+   4. MEDIAPIPE HAND TRACKING
+----------------------------------------------------------- */
+const videoElement = document.getElementById('video');
+const keys = Object.keys(shapeGenerators);
+let shapeIndex = 0;
+let pinchDebounce = false;
+
+function onResults(results) {
+    if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+        document.getElementById("gesture-display").innerText = "INPUT: SEARCHING...";
+        isInteracting = false;
+        // Reset rotation slowly if no hand
+        targetRotation.x = 0;
+        targetRotation.y = 0;
+        targetExpansion = 1.0;
+        return;
+    }
+
+    isInteracting = true;
+    const landmarks = results.multiHandLandmarks[0];
+
+    // 1. Pinch Detection (Thumb tip vs Index tip)
+    const thumb = landmarks[4];
+    const index = landmarks[8];
+    const dist = Math.hypot(thumb.x - index.x, thumb.y - index.y);
+
+    if (dist < 0.05) {
+        if (!pinchDebounce) {
+            pinchDebounce = true;
+            shapeIndex = (shapeIndex + 1) % keys.length;
+            const nextShape = keys[shapeIndex];
+            shapeGenerators[nextShape]();
+            
+            // UI Feedback
+            const modeEl = document.getElementById("mode-display");
+            modeEl.innerText = `SYSTEM: ${nextShape}`;
+            modeEl.style.color = "#fff";
+            setTimeout(() => modeEl.style.color = CONFIG.colors.primary.getStyle(), 200);
+            
+            document.getElementById("gesture-display").innerText = "INPUT: PINCH (SWAP)";
+            
+            setTimeout(() => { pinchDebounce = false; }, 800); // 800ms cooldown
+        }
+    } else {
+        document.getElementById("gesture-display").innerText = "INPUT: TRACKING";
+    }
+
+    // 2. Expansion (Index tip vs Middle tip)
+    const middle = landmarks[12];
+    const spread = Math.hypot(index.x - middle.x, index.y - middle.y);
+    // Map spread 0.05-0.25 to expansion 1.0-4.0
+    targetExpansion = THREE.MathUtils.mapLinear(THREE.MathUtils.clamp(spread, 0.05, 0.25), 0.05, 0.25, 1.0, 4.0);
+
+    // 3. Rotation (Hand Position relative to center)
+    // Lerp targets for smoothness
+    const wrist = landmarks[0];
+    targetRotation.y = (wrist.x - 0.5) * 3; 
+    targetRotation.x = (wrist.y - 0.5) * 3;
+}
+
+const hands = new Hands({locateFile: (file) => {
+    return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+}});
+
+hands.setOptions({
+    maxNumHands: 1,
+    modelComplexity: 1,
+    minDetectionConfidence: 0.6,
+    minTrackingConfidence: 0.6
+});
+
+hands.onResults(onResults);
+
+/* -----------------------------------------------------------
+   5. ANIMATION LOOP
+----------------------------------------------------------- */
+function animate() {
+    requestAnimationFrame(animate);
+
+    const time = performance.now();
+    const dt = (time - lastTime) / 1000;
+    lastTime = time;
+
+    // Calculate FPS
+    if (Math.round(time) % 20 === 0) {
+        document.getElementById('fps-val').innerText = Math.round(1/dt);
+        document.getElementById('exp-val').innerText = currentExpansion.toFixed(2);
+    }
+
+    // Smooth Interpolation for Controls
+    currentExpansion += (targetExpansion - currentExpansion) * 0.1;
+    currentRotation.x += (targetRotation.x - currentRotation.x) * 0.1;
+    currentRotation.y += (targetRotation.y - currentRotation.y) * 0.1;
+
+    const posAttr = geometry.attributes.position.array;
+
+    for(let i=0; i<CONFIG.particleCount; i++) {
+        const ix = i * 3;
+        const iy = i * 3 + 1;
+        const iz = i * 3 + 2;
+
+        // Base Target Position with Expansion
+        let tx = targets[ix] * currentExpansion;
+        let ty = targets[iy] * currentExpansion;
+        let tz = targets[iz] * currentExpansion;
+
+        // Add "Breathing" noise
+        const noise = Math.sin(time * 0.001 + i * 0.01) * 0.2;
+        tx += noise; ty += noise; tz += noise;
+
+        // Move particle towards target (Lerp)
+        // 0.1 is the speed factor. Lower = smoother/slower
+        posAttr[ix] += (tx - posAttr[ix]) * 0.08;
+        posAttr[iy] += (ty - posAttr[iy]) * 0.08;
+        posAttr[iz] += (tz - posAttr[iz]) * 0.08;
+    }
+
+    geometry.attributes.position.needsUpdate = true;
+
+    // Rotate Entire System
+    points.rotation.y = currentRotation.y + time * 0.0001; // Auto rotate slightly
+    points.rotation.x = currentRotation.x;
+    
+    // Render via Composer (Bloom)
+    composer.render();
+}
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    composer.setSize(window.innerWidth, window.innerHeight);
+}
+
+// Start Button Logic
+const startBtn = document.getElementById('startBtn');
+const loading = document.getElementById('loading');
+const cam = new Camera(videoElement, {
+    onFrame: async () => {
+        await hands.send({image: videoElement});
+    },
+    width: 640,
+    height: 480
+});
+
+startBtn.addEventListener('click', () => {
+    startBtn.style.display = 'none';
+    loading.style.display = 'block';
+    
+    init();
+    animate();
+
+    cam.start()
+        .then(() => {
+            document.getElementById('overlay').style.display = 'none';
+        })
+        .catch(err => {
+            console.error(err);
+            loading.innerText = "ERROR: CAMERA ACCESS DENIED";
+            loading.style.color = "red";
+        });
+});
+
+</script>
+</body>
+</html>

@@ -189,6 +189,7 @@ print(v)  # <class 'float'>
 print(d)  # 31.0
 """
 
+"""
 #input function
 
 #string input
@@ -212,3 +213,5 @@ f= int(input("Enter the second number: "))
 print("Number first is: ",e)
 print("Number second is: ",f) 
 print("Sum of first and second is: ",e+f)  # it will add the two numbers , same for multiplication, division, subtraction etc for all type of inputs 
+
+"""

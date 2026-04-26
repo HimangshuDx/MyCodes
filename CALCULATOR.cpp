@@ -8,6 +8,7 @@ class intro
         cout<<"\n\n\n       WELCOME TO THE CALCULATOR \n\n";
         }
 };
+
 class calculator 
 {
 public:
@@ -2326,9 +2327,6 @@ public:
          cout << "\n\nEnter your choice (1-13): ";
          cin >> choice;
 
-        if (choice == 0)
-        {  
-        }
             if (choice == 1)
             {    
                 l.length_intro();
@@ -2591,3 +2589,7 @@ if(m=='N' || m=='n')
 
 return 0;
 }
+
+
+
+//ToDo: return to main menu after conversion, return to previous menu after conversion, add more conversions, add more features, add more functionalities, add more error handling, add more input validation, add more output formatting, add more comments, add more documentation, add more examples, add more test cases, add more user interface improvements, add more user experience improvements, add more performance improvements, add more security improvements, add more scalability improvements, add more maintainability improvements, add more extensibility improvements.

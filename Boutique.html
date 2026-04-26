@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>someone made you a bouquet — digibouquet</title>
+    <style>
+        /* General Page Styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: #fdf6ec; /* Warm beige background */
+            font-family: "Courier New", Courier, monospace; /* Retro digital font feel */
+            color: #4a4a4a;
+            text-align: center;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Header */
+        header {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            width: 200px;
+            height: auto;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            font-weight: normal;
+            margin: 10px 0;
+        }
+
+        /* Bouquet Area */
+        .bouquet-container {
+            position: relative;
+            width: 100%;
+            height: 500px; /* Adjust height for the bouquet */
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* Align bush to bottom */
+        }
+
+        .bouquet-layer {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            /* Default size for bush parts */
+            width: 300px; 
+            pointer-events: none;
+        }
+
+        /* Flower Styles */
+        .flower {
+            position: absolute;
+            transform: translate(-50%, -50%); /* Center the flower on its coordinate */
+            transition: transform 0.2s;
+        }
+
+        .flower:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            z-index: 100 !important;
+        }
+
+        /* Helper utility to size images similarly to source */
+        .w-256 { width: 128px; }
+        .w-160 { width: 80px; }
+        .w-384 { width: 192px; }
+
+        /* Text Card */
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            width: 90%;
+            max-width: 400px;
+            text-align: left;
+            margin-top: -20px;
+            z-index: 20;
+            position: relative;
+        }
+
+        .card p {
+            margin: 10px 0;
+            line-height: 1.5;
+            font-size: 1.1rem;
+        }
+
+        .signature {
+            margin-top: 20px;
+        }
+
+        /* Footer / Actions */
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #333;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #f0f0f0;
+        }
+
+        .footer-text {
+            margin-top: 40px;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .footer-text a {
+            color: #555;
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <img src="https://digibouquet.vercel.app/_next/image?url=%2Fdigibouquet.png&w=640&q=75" alt="digibouquet" class="logo">
+            <h1>Hi, I made this bouquet for you!</h1>
+        </header>
+
+        <div class="bouquet-container">
+            
+            <img src="https://digibouquet.vercel.app/_next/image?url=%2Fcolor%2Fbush%2Fbush-1.png&w=1200&q=75" 
+                 class="bouquet-layer" style="z-index: 1; width: 350px;">
+
+            <img src="https://digibouquet.vercel.app/_next/image?url=%2Fcolor%2Fflowers%2Ftulip.png&w=256&q=75" 
+                 class="flower w-256" style="z-index: 2; bottom: 180px; left: 45%;">
+
+            <img src="https://digibouquet.vercel.app/_next/image?url=%2Fcolor%2Fflowers%2Fdaisy.png&w=160&q=75" 
+                 class="flower w-160" style="z-index: 3; bottom: 150px; left: 60%;">
+
+            <img src="https://digibouquet.vercel.app/_next/image?url=%2Fcolor%2Fflowers%2Fzinnia.png&w=256&q=75" 
+                 class="flower w-256" style="z-index: 4; bottom: 220px; left: 55%;">
+
+            <img src="https://digibouquet.vercel.app/_next/image?url=%2Fcolor%2Fflowers%2Fcarnation.png&w=384&q=75" 
+                 class="flower w-384" style="z-index: 5; bottom: 190px; left: 35%;">
+
+            <img src="https://digibouquet.vercel.app/_next/image?url=%2Fcolor%2Fflowers%2Franunculus.png&w=256&q=75" 
+                 class="flower w-256" style="z-index: 6; bottom: 240px; left: 45%;">
+
+            <img src="https://digibouquet.vercel.app/_next/image?url=%2Fcolor%2Fflowers%2Frose.png&w=256&q=75" 
+                 class="flower w-256" style="z-index: 7; bottom: 160px; left: 50%;">
+
+            <img src="https://digibouquet.vercel.app/_next/image?url=%2Fcolor%2Fflowers%2Fpeony.png&w=256&q=75" 
+                 class="flower w-256" style="z-index: 8; bottom: 210px; left: 65%;">
+
+            <img src="https://digibouquet.vercel.app/_next/image?url=%2Fcolor%2Fflowers%2Fdahlia.png&w=160&q=75" 
+                 class="flower w-160" style="z-index: 9; bottom: 260px; left: 50%;">
+
+            <img src="https://digibouquet.vercel.app/_next/image?url=%2Fcolor%2Fflowers%2Fanemone.png&w=256&q=75" 
+                 class="flower w-256" style="z-index: 10; bottom: 230px; left: 35%;">
+
+            <img src="https://digibouquet.vercel.app/_next/image?url=%2Fcolor%2Fflowers%2Fsunflower.png&w=384&q=75" 
+                 class="flower w-384" style="z-index: 11; bottom: 280px; left: 55%;">
+
+
+            <img src="https://digibouquet.vercel.app/_next/image?url=%2Fcolor%2Fbush%2Fbush-1-top.png&w=1200&q=75" 
+                 class="bouquet-layer" style="z-index: 20; width: 350px;">
+        </div>
+
+        <div class="card">
+            <p>Dear Abantika(Maini)</p>
+            <br>
+            <p class="signature">Sincerely,</p>
+        </div>
+
+        <div class="actions">
+            <button class="btn" onclick="alert('Link copied!')">copy link</button>
+            <button class="btn">share</button>
+        </div>
+
+        <a href="https://digibouquet.vercel.app/" class="btn" style="margin-top: 20px; background: #333; color: white; border: none;">make a bouquet now!</a>
+
+        <div class="footer-text">
+            made with digibouquet, a tool by <a href="https://x.com/pau_wee_">@pau_wee_</a>
+        </div>
+    </div>
+
+</body>
+</html>
